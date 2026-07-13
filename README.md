@@ -22,4 +22,4 @@ processing time, as both operations examine every pixel in the frame. Contour
 detection and drawing operations are comparatively inexpensive since they only
 process detected object boundaries.
 
-The demo videos are uploaded alongwith the project.
+The demo videos are attached alongwith the code.
