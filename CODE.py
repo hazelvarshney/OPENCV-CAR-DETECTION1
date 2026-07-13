@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import time
 
-vid = cv.VideoCapture("ferrari.mp4")
+vid = cv.VideoCapture("cars.mp4")
 
 fps = vid.get(cv.CAP_PROP_FPS)
 frame_time = 1000 / fps
@@ -28,21 +28,15 @@ while True:
 
     if not ret:
         break
-    t1 = time.time()
-    hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-    hsv_times.append((time.time() - t1)*1000)
 
-    t2  = time.time()
+    hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+
     mask1 = cv.inRange(hsv, lower_red1, upper_red1)
     mask2 = cv.inRange(hsv, lower_red2, upper_red2)
     red_mask = cv.bitwise_or(mask1,mask2)
-    mask_times.append((time.time() - t2)*1000)
 
-    t3 = time.time()
     contours, _ = cv.findContours(red_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    contour_times.append((time.time() - t3)*1000)
 
-    t4 = time.time()
 
     if contours:
         largest = max(contours, key=cv.contourArea)
@@ -50,16 +44,15 @@ while True:
         if area > 500:
             x, y, w, h = cv.boundingRect(largest)
             cv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    draw_times.append((time.time() - t4)*1000)
+            cv.putText(frame, "McQueen", (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
 
     if area>500:
         x,y,w,h = cv.boundingRect(largest)
         cv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         center = (x+w//2, y+h//2)
-        trail_points.append(center)
-    for i in range(1, len(trail_points)):
-        cv.line(frame, trail_points[i - 1], trail_points[i], (255, 0, 0), 2)
-    cv.imshow("Tracking", frame)
+
+    cv.imshow("Cars", frame)
     cv.imshow("Mask", red_mask)
 
     elapsed = (time.time() - start) * 1000
@@ -70,10 +63,3 @@ while True:
 
 vid.release()
 cv.destroyAllWindows()
-
-print(f"\nProcessed {frame_count} frames\n")
-print(f"{'Stage':25s}{'Avg Time (ms)':>15s}")
-print(f"{'Color Conversion (HSV)':25s}{np.mean(hsv_times):>15.3f}")
-print(f"{'Masking (inRange+OR)':25s}{np.mean(mask_times):>15.3f}")
-print(f"{'Contour Detection':25s}{np.mean(contour_times):>15.3f}")
-print(f"{'Draw Bounding Box':25s}{np.mean(draw_times):>15.3f}")
