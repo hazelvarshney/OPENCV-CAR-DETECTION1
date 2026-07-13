@@ -13,5 +13,13 @@ applies colour masks to isolate the target object.
 It then draws a bounding box around the detected car and then displays the
 processed video in real time.
 
-The demo videos are uploaded this project alongwith the performance
-benchmarks.
+The objective of this project was to gain hands on experience with the core 
+concepts of OpenCV by implementing a simple yet effective colour-based object 
+tracking system
+
+The benchmarking showed that colour conversion and masking consume most of the 
+processing time, as both operations examine every pixel in the frame. Contour 
+detection and drawing operations are comparatively inexpensive since they only
+process detected object boundaries.
+
+The demo videos are uploaded alongwith the project.
