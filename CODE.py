@@ -2,14 +2,20 @@ import cv2 as cv
 import numpy as np
 import time
 
-vid = cv.VideoCapture("cars.mp4")
+vid = cv.VideoCapture("f1.mp4")
 
 fps = vid.get(cv.CAP_PROP_FPS)
 frame_time = 1000 / fps
-lower_red1 = np.array([0, 80, 40])
-upper_red1 = np.array([10, 255, 255])
-lower_red2 = np.array([170, 80, 40])
+lower_red1 = np.array([0, 150, 40])
+upper_red1 = np.array([4, 255, 255])
+
+lower_red2 = np.array([160, 50, 50])
 upper_red2 = np.array([180, 255, 255])
+
+lower_mclaren = np.array([5, 65, 40])
+upper_mclaren = np.array([22, 255, 255])
+
+kernel = np.ones((5, 5), np.uint8)
 
 hsv_times = []
 mask_times = []
@@ -18,8 +24,14 @@ draw_times = []
 
 frame_count = 0
 
-trail_points = []
+cv.namedWindow("Cars", cv.WINDOW_NORMAL)
+cv.resizeWindow("Cars", 960, 540)
 
+def print_hsv(event, x, y, flags, param):
+    if event == cv.EVENT_LBUTTONDOWN:
+        print(hsv[y, x])
+
+cv.setMouseCallback("Cars", print_hsv)
 
 while True:
     start = time.time()
@@ -33,25 +45,39 @@ while True:
 
     mask1 = cv.inRange(hsv, lower_red1, upper_red1)
     mask2 = cv.inRange(hsv, lower_red2, upper_red2)
-    red_mask = cv.bitwise_or(mask1,mask2)
+    red_mask = cv.bitwise_or(mask1, mask2)
+    red_mask = cv.morphologyEx(red_mask, cv.MORPH_CLOSE, kernel)
+    red_mask = cv.morphologyEx(red_mask, cv.MORPH_OPEN, kernel)
 
     contours, _ = cv.findContours(red_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
-
     if contours:
-        largest = max(contours, key=cv.contourArea)
-        area = cv.contourArea(largest)
-        if area > 500:
-            x, y, w, h = cv.boundingRect(largest)
-            cv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv.putText(frame, "McQueen", (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        for c in contours:
+            area = cv.contourArea(c)
+            if area > 500:
+                x, y, w, h = cv.boundingRect(c)
+                rect_area = w * h
+                extent = area / float(rect_area)
+                if extent > 0.5:
+                    cv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    cv.putText(frame, "Ferrari", (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
+    mclaren_mask = cv.inRange(hsv, lower_mclaren, upper_mclaren)
+    mclaren_mask = cv.morphologyEx(mclaren_mask, cv.MORPH_CLOSE, kernel)
+    mclaren_mask = cv.morphologyEx(mclaren_mask, cv.MORPH_OPEN, kernel)
 
-    if area>500:
-        x,y,w,h = cv.boundingRect(largest)
-        cv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        center = (x+w//2, y+h//2)
+    mclaren_contours, _ = cv.findContours(mclaren_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
+    if mclaren_contours:
+        for c in mclaren_contours:
+            area = cv.contourArea(c)
+            if area > 500:
+                x, y, w, h = cv.boundingRect(c)
+                rect_area = w * h
+                extent = area / float(rect_area)
+                if extent > 0.5:
+                    cv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
+                    cv.putText(frame, "McLaren", (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
     cv.imshow("Cars", frame)
     cv.imshow("Mask", red_mask)
 
