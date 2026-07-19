@@ -24,13 +24,12 @@ The objective of this project was to gain hands on experience with the core
 concepts of OpenCV by implementing a simple yet effective colour-based object
 tracking system.
 
-# Performance Notes
+# Benchmarks
 
 The benchmarking showed that colour conversion and masking consume most of the
 processing time, as both operations examine every pixel in the frame. Contour
-detection and drawing operations are comparatively inexpensive since they only
+detection and drawing operations are comparatively less consuming since they only
 process detected object boundaries.
 
-# Demo
 The demo videos are attached alongwith the code.
-The demo videos are attached alongwith the code.
+
