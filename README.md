@@ -21,8 +21,8 @@ processed video in real time.
 # Objective
 
 The objective of this project was to gain hands on experience with the core
-concepts of OpenCV by implementing a simple yet effective colour-based object
-tracking system.
+concepts of OpenCV by implementing a simple colour based object tracking
+system.
 
 # Benchmarks
 
