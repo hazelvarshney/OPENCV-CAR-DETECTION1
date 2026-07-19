@@ -33,7 +33,7 @@ process detected object boundaries.
 
 The demo videos are attached alongwith the code.
 
-## OpenCV Functions Used
+## OpenCV Functions Learned
 
 | Function | Purpose |
 |---|---|
